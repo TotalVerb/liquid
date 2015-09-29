@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Liquid</title>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.5.0/fabric.min.js"></script>
+    <script src="lib/hand.min.js"></script>
+    <script data-main="dist/main" src="lib/require.js"></script>
+    <link rel="stylesheet" href="css/master.css" media="screen" title="no title" charset="utf-8">
+  </head>
+  <body>
+    <p id="preload">
+      Your browser does not support this version of the game.
+      Please consider using the <a href="legacy.html">legacy edition</a>
+      instead.
+    </p>
+    <p>
+      Liquid is open-source and licensed under the GNU GPL version 3. The game
+      is played by using the bucket tool to fill territories with your colour of
+      water. Once a territory is full, filling it with more water causes the
+      weakest wall of the territory to collapse. All neighbouring territories
+      are absorbed into the exploding territory. Their water is recoloured to
+      your colour. This could potentially set off a chain reaction. You win when
+      the entire map is filled with your colour. If you have no legal move, then
+      you lose.
+    </p>
+    <p>
+      Walls are coloured by strength&mdash;violet is strongest and red is
+      weakest. Hovering over a territory will highlight the weakest wall.
+    </p>
+    <canvas width="800" height="600" id="game-area">
+      Your browser does not support this game.
+    </canvas>
+
+  </body>
+</html>

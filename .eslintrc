@@ -1,0 +1,15 @@
+{
+  "ecmaFeatures": {
+    "modules": true
+  },
+  "rules": {
+    "quotes": 0
+  },
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "globals": {
+    "fabric": true
+  }
+}
