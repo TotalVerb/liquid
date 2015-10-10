@@ -29,6 +29,57 @@ define(['exports'], function (exports) {
     this.colour = colour;
   };
 
+  var Sidebar = (function () {
+    function Sidebar() {
+      _classCallCheck(this, Sidebar);
+
+      // Load logo
+      fabric.Image.fromURL('res/liquid.svg', oImg => {
+        oImg = oImg.scale(0.1);
+        this.playerText = new fabric.Text('You are: ', {
+          top: 50,
+          fontSize: 20
+        });
+        this.playerColour = new fabric.Rect({
+          top: 50,
+          left: 80,
+          width: 20,
+          height: 20,
+          stroke: 'black',
+          fill: 'white'
+        });
+        this.sidebarGroup = new fabric.Group([oImg, this.playerText, this.playerColour], {
+          left: 500,
+          top: 20
+        });
+      });
+    }
+
+    _createClass(Sidebar, [{
+      key: 'attach',
+      value: function attach(parent, callback = () => {}) {
+        if (this.sidebarGroup !== undefined) {
+          parent.add(this.sidebarGroup);
+          callback();
+        } else {
+          setTimeout(() => this.attach(parent, callback), 100);
+        }
+      }
+    }, {
+      key: 'update',
+      value: function update(player, callback = () => {}) {
+        if (this.sidebarGroup !== undefined) {
+          this.playerColour.fill = player.colour;
+          callback();
+        } else {
+          setTimeout(() => this.update(player, callback), 100);
+        }
+      }
+    }]);
+
+    return Sidebar;
+  })();
+
   var Display = (function () {
     function Display(map, gameArea) {
       _classCallCheck(this, Display);
@@ -63,6 +114,7 @@ define(['exports'], function (exports) {
         this.update();
         this.redrawLiquid(territory);
         this.currentPlayer = this.players[(this.currentPlayer.id + 1) % this.players.length];
+        this.beforeMove();
       });
       this.gameGroup.on('mousemove', options => {
         const territory = cursorTerritory(map, this.gameGroup, options, this);
@@ -90,16 +142,27 @@ define(['exports'], function (exports) {
       for (var t of Object.keys(map.territories)) {
         this.waters[t] = [];
       }
+
+      this.sidebar = new Sidebar();
+      this.beforeMove();
     }
 
     _createClass(Display, [{
       key: 'show',
       value: function show() {
         const area = this.gameArea;
+
         area.add(this.gameGroup);
-        area.forEachObject(obj => {
-          obj.selectable = false;
-        });
+        area.forEachObject(obj => obj.selectable = false);
+
+        this.sidebar.attach(area, () => area.forEachObject(obj => obj.selectable = false));
+      }
+    }, {
+      key: 'beforeMove',
+      value: function beforeMove() {
+        // Update sidebar.
+        this.sidebar.update(this.currentPlayer, () => this.gameArea.renderAll() // callback
+        );
       }
     }, {
       key: 'update',
@@ -143,7 +206,6 @@ define(['exports'], function (exports) {
           this.waters[territory.id].push(newObj);
           this.gameGroup.add(newObj);
           newObj.moveTo(1);
-          this.gameArea.renderAll();
         }
       }
     }]);
