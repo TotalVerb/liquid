@@ -19,6 +19,51 @@ class Player {
   }
 }
 
+class Sidebar {
+  constructor() {
+    // Load logo
+    fabric.Image.fromURL('res/liquid.svg', oImg => {
+      oImg = oImg.scale(0.1);
+      this.playerText = new fabric.Text("You are: ", {
+        top: 50,
+        fontSize: 20
+      });
+      this.playerColour = new fabric.Rect({
+        top: 50,
+        left: 80,
+        width: 20,
+        height: 20,
+        stroke: 'black',
+        fill: 'white'
+      })
+      this.sidebarGroup = new fabric.Group(
+        [oImg, this.playerText, this.playerColour],
+        {
+          left: 500,
+          top: 20
+        });
+    });
+  }
+
+  attach(parent, callback=()=>{}) {
+    if (this.sidebarGroup !== undefined) {
+      parent.add(this.sidebarGroup);
+      callback();
+    } else {
+      setTimeout(() => this.attach(parent, callback), 100);
+    }
+  }
+
+  update(player, callback=()=>{}) {
+    if (this.sidebarGroup !== undefined) {
+      this.playerColour.fill = player.colour;
+      callback();
+    } else {
+      setTimeout(() => this.update(player, callback), 100);
+    }
+  }
+}
+
 export class Display {
   constructor(map, gameArea) {
     this.gameArea = gameArea;
@@ -55,6 +100,7 @@ export class Display {
       this.redrawLiquid(territory);
       this.currentPlayer = this.players[
         (this.currentPlayer.id + 1) % this.players.length];
+      this.beforeMove();
     });
     this.gameGroup.on('mousemove', options => {
       const territory = cursorTerritory(map, this.gameGroup, options, this);
@@ -89,14 +135,27 @@ export class Display {
     for (let t of Object.keys(map.territories)) {
       this.waters[t] = [];
     }
+
+    this.sidebar = new Sidebar();
+    this.beforeMove();
   }
 
   show() {
     const area = this.gameArea;
+
     area.add(this.gameGroup);
-    area.forEachObject(obj => {
-      obj.selectable = false;
-    });
+    area.forEachObject(obj => (obj.selectable = false));
+
+    this.sidebar.attach(area, () =>
+      area.forEachObject(obj => (obj.selectable = false)));
+  }
+
+  beforeMove() {
+    // Update sidebar.
+    this.sidebar.update(
+      this.currentPlayer,
+      () => this.gameArea.renderAll()  // callback
+    );
   }
 
   update() {
@@ -138,7 +197,6 @@ export class Display {
       this.waters[territory.id].push(newObj);
       this.gameGroup.add(newObj);
       newObj.moveTo(1);
-      this.gameArea.renderAll();
     }
   }
 }

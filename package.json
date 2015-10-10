@@ -1,0 +1,21 @@
+{
+  "name": "liquid",
+  "version": "0.0.0",
+  "description": "A board game with rapid territory reversals.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TotalVerb/liquid.git"
+  },
+  "author": "Fengyang Wang",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/TotalVerb/liquid/issues"
+  },
+  "devDependencies": {
+    "eslint": "^1.6.0"
+  }
+}
