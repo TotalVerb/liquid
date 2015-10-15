@@ -1,6 +1,6 @@
 
-function getEdgeColour(edg) {
-  return `hsl(${Math.round(edg.strength * 300)}, 100%, 50%)`;
+function getEdgeColour(edg, lum=50) {
+  return `hsl(${Math.round(edg.strength * 300)}, 100%, ${lum}%)`;
 }
 
 function cursorTerritory(map, group, options, disp) {
@@ -10,6 +10,7 @@ function cursorTerritory(map, group, options, disp) {
   return map.getTerritory(x, y);
 }
 
+const STANDARD_EDGE_WIDTH = 5;
 const DIM = 400;
 
 class Player {
@@ -81,9 +82,9 @@ export class Display {
       left: 0,
       width: DIM,
       height: DIM,
-      fill: '#AAA',
+      fill: '#CCC',
       stroke: 'black',
-      strokeWidth: 2
+      strokeWidth: STANDARD_EDGE_WIDTH
     });
     this.gameGroup = new fabric.Group([this.gameRectangle], {
       top: 20,
@@ -105,11 +106,13 @@ export class Display {
     this.gameGroup.on('mousemove', options => {
       const territory = cursorTerritory(map, this.gameGroup, options, this);
       const weakestEdge = this.map.weakestEdge(territory);
-      if (this.lastFatEdge && this.edges[this.lastFatEdge]) {
-        this.edges[this.lastFatEdge].strokeWidth = 2;
+      const lfe = this.lastFatEdge;
+      const nfe = weakestEdge.pack();
+      if (lfe && this.edges[lfe]) {
+        this.edges[lfe].stroke = getEdgeColour(map.getEdge(lfe));
       }
-      this.edges[weakestEdge.pack()].strokeWidth = 5;
-      this.lastFatEdge = weakestEdge.pack();
+      this.edges[nfe].stroke = getEdgeColour(map.getEdge(nfe), 90);
+      this.lastFatEdge = nfe;
       this.gameArea.renderAll();
     });
 
@@ -125,7 +128,7 @@ export class Display {
         ],
         {
           stroke: getEdgeColour(edg),
-          strokeWidth: 2
+          strokeWidth: STANDARD_EDGE_WIDTH
         }
       );
       this.edges[edg.pack()] = (fbObject);
