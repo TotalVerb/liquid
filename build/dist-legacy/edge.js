@@ -5,7 +5,7 @@ define(['exports'], function (exports) {
     value: true
   });
 
-  var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+  var _get = function get(_x3, _x4, _x5) { var _again = true; _function: while (_again) { var object = _x3, property = _x4, receiver = _x5; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x3 = parent; _x4 = property; _x5 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
   var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
@@ -27,22 +27,41 @@ define(['exports'], function (exports) {
     _createClass(Edge, [{
       key: 'acrossTerritory',
       value: function acrossTerritory(territory) {
-        for (var _ref3 of territory.coordinates) {
-          var _ref2 = _slicedToArray(_ref3, 2);
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
 
-          var x = _ref2[0];
-          var y = _ref2[1];
+        try {
+          for (var _iterator = territory.coordinates[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var _step$value = _slicedToArray(_step.value, 2);
 
-          const result = this.across(x, y);
-          if (result !== undefined) {
-            return result;
+            var x = _step$value[0];
+            var y = _step$value[1];
+
+            var result = this.across(x, y);
+            if (result !== undefined) {
+              return result;
+            }
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator['return']) {
+              _iterator['return']();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
           }
         }
       }
     }, {
       key: 'pack',
       value: function pack() {
-        return `${ this.type }${ this.x } ${ this.y }`;
+        return '' + this.type + '' + this.x + ' ' + this.y;
       }
     }]);
 
@@ -50,9 +69,8 @@ define(['exports'], function (exports) {
   })();
 
   var VerticalEdge = (function (_Edge) {
-    function VerticalEdge(x, y, _ref4) {
-      var _ref42 = _ref4;
-      var strength = _ref42 === undefined ? Math.random() : _ref42;
+    function VerticalEdge(x, y) {
+      var strength = arguments[2] === undefined ? Math.random() : arguments[2];
 
       _classCallCheck(this, VerticalEdge);
 
@@ -105,9 +123,8 @@ define(['exports'], function (exports) {
   exports.VerticalEdge = VerticalEdge;
 
   var HorizontalEdge = (function (_Edge2) {
-    function HorizontalEdge(x, y, _ref5) {
-      var _ref52 = _ref5;
-      var strength = _ref52 === undefined ? Math.random() : _ref52;
+    function HorizontalEdge(x, y) {
+      var strength = arguments[2] === undefined ? Math.random() : arguments[2];
 
       _classCallCheck(this, HorizontalEdge);
 
@@ -158,13 +175,13 @@ define(['exports'], function (exports) {
   })(Edge);
 
   exports.HorizontalEdge = HorizontalEdge;
-  const EDGE_OFFSETS = {
+  var EDGE_OFFSETS = {
     h: [0, -1],
     v: [-1, 0]
   };
 
   exports.EDGE_OFFSETS = EDGE_OFFSETS;
-  const EDGE_CLASS = {
+  var EDGE_CLASS = {
     h: HorizontalEdge,
     v: VerticalEdge
   };

@@ -5,17 +5,17 @@ define(["exports", "edge", "display", "territory"], function (exports, _edge, _d
 
   function _slicedToArray(arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }
 
+  function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
+
   function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-  const gameArea = new fabric.Canvas("game-area");
+  var gameArea = new fabric.Canvas("game-area");
   gameArea.selection = false;
 
   var Map = (function () {
-    function Map(_ref, _ref3) {
-      var _ref2 = _ref;
-      var width = _ref2 === undefined ? 4 : _ref2;
-      var _ref32 = _ref3;
-      var height = _ref32 === undefined ? 4 : _ref32;
+    function Map() {
+      var width = arguments[0] === undefined ? 4 : arguments[0];
+      var height = arguments[1] === undefined ? 4 : arguments[1];
 
       _classCallCheck(this, Map);
 
@@ -34,18 +34,39 @@ define(["exports", "edge", "display", "territory"], function (exports, _edge, _d
       // Create territories
       for (var x = 0; x < width; x++) {
         for (var y = 0; y < width; y++) {
-          const id = x + y * width; // Territory ID
-          const newTerritory = new _territory.Territory(id, [[x, y]]);
+          var id = x + y * width; // Territory ID
+          var newTerritory = new _territory.Territory(id, [[x, y]]);
           this.inTerritory[(0, _territory.pack)(x, y)] = newTerritory;
           this.territories[id] = newTerritory;
         }
       }
 
       // Create edges
-      for (var t of "hv") {
-        for (var x = 0; x < this.width + _edge.EDGE_OFFSETS[t][0]; x++) {
-          for (var y = 0; y < this.height + _edge.EDGE_OFFSETS[t][1]; y++) {
-            this.edgeObject[`${ t }${ x } ${ y }`] = new _edge.EDGE_CLASS[t](x, y);
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = "hv"[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var t = _step.value;
+
+          for (var x = 0; x < this.width + _edge.EDGE_OFFSETS[t][0]; x++) {
+            for (var y = 0; y < this.height + _edge.EDGE_OFFSETS[t][1]; y++) {
+              this.edgeObject["" + t + "" + x + " " + y] = new _edge.EDGE_CLASS[t](x, y);
+            }
+          }
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator["return"]) {
+            _iterator["return"]();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
           }
         }
       }
@@ -69,39 +90,66 @@ define(["exports", "edge", "display", "territory"], function (exports, _edge, _d
     }, {
       key: "weakestEdge",
       value: function weakestEdge(territory) {
+        var _this = this;
+
         // Get an array of edges...
         var edges = Array.from(territory.edges());
 
         // Eliminate edges that don't exist.
-        edges = edges.filter(e => this.edgeObject[e]).map(e => this.edgeObject[e]);
+        edges = edges.filter(function (e) {
+          return _this.edgeObject[e];
+        }).map(function (e) {
+          return _this.edgeObject[e];
+        });
 
         // Find the weakest edge.
-        return edges.reduce((e1, e2) => e2.strength > e1.strength ? e1 : e2, edges[0]);
+        return edges.reduce(function (e1, e2) {
+          return e2.strength > e1.strength ? e1 : e2;
+        }, edges[0]);
       }
     }, {
       key: "fillTerritory",
-      value: function fillTerritory(territory, owner, _ref4) {
-        var _ref42 = _ref4;
-        var add = _ref42 === undefined ? 1 / 3 : _ref42;
+      value: function fillTerritory(territory, owner) {
+        var add = arguments[2] === undefined ? 1 / 3 : arguments[2];
 
-        const full = territory.fill(owner, add);
+        var full = territory.fill(owner, add);
         if (full) {
-          const weakestEdge = this.weakestEdge(territory);
+          var weakestEdge = this.weakestEdge(territory);
 
           // Get the territory across from that edge.
-          const acrossTerritory = this.getTerritory(...weakestEdge.acrossTerritory(territory));
+          var acrossTerritory = this.getTerritory.apply(this, _toConsumableArray(weakestEdge.acrossTerritory(territory)));
 
           // Eat that territory.
           this.territories[acrossTerritory.id] = null;
           territory.eat(acrossTerritory);
-          for (var _ref53 of acrossTerritory.coordinates) {
-            var _ref52 = _slicedToArray(_ref53, 2);
+          var _iteratorNormalCompletion2 = true;
+          var _didIteratorError2 = false;
+          var _iteratorError2 = undefined;
 
-            var x = _ref52[0];
-            var y = _ref52[1];
+          try {
+            for (var _iterator2 = acrossTerritory.coordinates[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+              var _step2$value = _slicedToArray(_step2.value, 2);
 
-            this.inTerritory[(0, _territory.pack)(x, y)] = territory;
+              var x = _step2$value[0];
+              var y = _step2$value[1];
+
+              this.inTerritory[(0, _territory.pack)(x, y)] = territory;
+            }
+          } catch (err) {
+            _didIteratorError2 = true;
+            _iteratorError2 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion2 && _iterator2["return"]) {
+                _iterator2["return"]();
+              }
+            } finally {
+              if (_didIteratorError2) {
+                throw _iteratorError2;
+              }
+            }
           }
+
           this.edgeObject[weakestEdge.pack()] = null;
         }
       }

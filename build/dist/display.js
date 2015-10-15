@@ -7,10 +7,15 @@ define(['exports'], function (exports) {
 
   var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
+  function _slicedToArray(arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }
+
   function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-  function getEdgeColour(edg) {
-    return `hsl(${ Math.round(edg.strength * 300) }, 100%, 50%)`;
+  function getEdgeColour(edg, _ref) {
+    var _ref2 = _ref;
+    var lum = _ref2 === undefined ? 50 : _ref2;
+
+    return `hsl(${ Math.round(edg.strength * 300) }, 100%, ${ lum }%)`;
   }
 
   function cursorTerritory(map, group, options, disp) {
@@ -20,6 +25,7 @@ define(['exports'], function (exports) {
     return map.getTerritory(x, y);
   }
 
+  const STANDARD_EDGE_WIDTH = 5;
   const DIM = 400;
 
   var Player = function Player(id, colour) {
@@ -57,7 +63,10 @@ define(['exports'], function (exports) {
 
     _createClass(Sidebar, [{
       key: 'attach',
-      value: function attach(parent, callback = () => {}) {
+      value: function attach(parent, _ref3) {
+        var _ref32 = _ref3;
+        var callback = _ref32 === undefined ? () => {} : _ref32;
+
         if (this.sidebarGroup !== undefined) {
           parent.add(this.sidebarGroup);
           callback();
@@ -67,7 +76,10 @@ define(['exports'], function (exports) {
       }
     }, {
       key: 'update',
-      value: function update(player, callback = () => {}) {
+      value: function update(player, _ref4) {
+        var _ref42 = _ref4;
+        var callback = _ref42 === undefined ? () => {} : _ref42;
+
         if (this.sidebarGroup !== undefined) {
           this.playerColour.fill = player.colour;
           callback();
@@ -96,9 +108,9 @@ define(['exports'], function (exports) {
         left: 0,
         width: DIM,
         height: DIM,
-        fill: '#AAA',
+        fill: '#CCC',
         stroke: 'black',
-        strokeWidth: 2
+        strokeWidth: STANDARD_EDGE_WIDTH
       });
       this.gameGroup = new fabric.Group([this.gameRectangle], {
         top: 20,
@@ -119,11 +131,13 @@ define(['exports'], function (exports) {
       this.gameGroup.on('mousemove', options => {
         const territory = cursorTerritory(map, this.gameGroup, options, this);
         const weakestEdge = this.map.weakestEdge(territory);
-        if (this.lastFatEdge && this.edges[this.lastFatEdge]) {
-          this.edges[this.lastFatEdge].strokeWidth = 2;
+        const lfe = this.lastFatEdge;
+        const nfe = weakestEdge.pack();
+        if (lfe && this.edges[lfe]) {
+          this.edges[lfe].stroke = getEdgeColour(map.getEdge(lfe));
         }
-        this.edges[weakestEdge.pack()].strokeWidth = 5;
-        this.lastFatEdge = weakestEdge.pack();
+        this.edges[nfe].stroke = getEdgeColour(map.getEdge(nfe), 90);
+        this.lastFatEdge = nfe;
         this.gameArea.renderAll();
       });
 
@@ -133,7 +147,7 @@ define(['exports'], function (exports) {
         const edg = map.getEdge(e);
         const fbObject = new fabric.Line([edg.x1 * this.scaleFactor - DIM / 2, edg.y1 * this.scaleFactor - DIM / 2, edg.x2 * this.scaleFactor - DIM / 2, edg.y2 * this.scaleFactor - DIM / 2], {
           stroke: getEdgeColour(edg),
-          strokeWidth: 2
+          strokeWidth: STANDARD_EDGE_WIDTH
         });
         this.edges[edg.pack()] = fbObject;
         this.gameGroup.add(fbObject);
@@ -195,7 +209,12 @@ define(['exports'], function (exports) {
         this.waters[territory.id] = [];
 
         for (var rect of territory.liquidRects()) {
-          const [x, y, depth] = rect;
+          var _rect = _slicedToArray(rect, 3);
+
+          const x = _rect[0];
+          const y = _rect[1];
+          const depth = _rect[2];
+
           const newObj = new fabric.Rect({
             left: this.scaleFactor * x - DIM / 2,
             top: this.scaleFactor * y - DIM / 2 + this.scaleFactor * (1 - depth),
