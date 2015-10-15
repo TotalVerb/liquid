@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Liquid</title>
+    <title>Liquid &mdash; Legacy Edition</title>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.5.0/fabric.min.js"></script>
+    <script src="lib/browser-polyfill.js"></script>
     <!-- <script src="lib/hand.min.js"></script> -->
-    <script data-main="dist/main" src="lib/require.js"></script>
+    <script data-main="dist-legacy/main" src="lib/require.js"></script>
     <link rel="stylesheet" href="css/master.css" media="screen" title="no title" charset="utf-8">
   </head>
   <body>
-    <p id="preload">
-      Your browser does not support this version of the game.
-      Please consider using the <a href="legacy.html">legacy edition</a>
-      instead.
+    <p>
+      Are you running a newer browser? Please consider running the
+      <a href="liquid.html">standard edition</a>.
     </p>
     <p>
       Liquid is open-source and licensed under the GNU GPL version 3. The game
@@ -30,10 +30,5 @@
     <canvas width="800" height="600" id="game-area">
       Your browser does not support this game.
     </canvas>
-    <script type="text/javascript">
-      try {
-        eval("(() => {})(...[])");
-        document.body.removeChild(document.getElementById('preload'));
-      } catch(e) { /* ignore */ }
-    </script>
+  </body>
 </html>
