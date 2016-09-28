@@ -56,8 +56,9 @@ class Map {
     let edges = Array.from(territory.edges());
 
     // Eliminate edges that don't exist.
-    edges = edges.filter(
-      e => this.edgeObject[e]).map(e => this.edgeObject[e]);
+    edges = edges
+      .filter(e => this.edgeObject[e])
+      .map(e => this.edgeObject[e]);
 
     // Find the weakest edge.
     return edges.reduce(
